@@ -24,38 +24,15 @@ Home-Based Video Scheduler and Player as Television">
 
                 <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="View Available Cars" Style="{StaticResource NormalButton}" Command="{Binding ViewAvailableCarsCommand}"/>
+                        <Button Content="Video Player" Style="{StaticResource NormalButton}" Command="{Binding ViewPlayerCommand}"/>
                     </Border>
                     <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Add Available Car" Style="{StaticResource NormalButton}" Command="{Binding AddACarCommand}"/>
+                        <Button Content="Scheduler" Style="{StaticResource NormalButton}" Command="{Binding SchedulerCommand}"/>
                     </Border>
                     <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Remove Available Car" Style="{StaticResource NormalButton}" Command="{Binding RemoveACarCommand}"/>
+                        <Button Content="Settings" Style="{StaticResource NormalButton}" Command="{Binding SettingsCommand}"/>
                     </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Edit Available Car" Style="{StaticResource NormalButton}" Command="{Binding EditACarCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Add Multiple Available Cars via CSV file" Style="{StaticResource NormalButton}" Command="{Binding AddMultipleCarsViaCSVFileCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="View Rented Cars" Style="{StaticResource NormalButton}" Command="{Binding ViewRentedCarsCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="View Cars in Maintenance" Style="{StaticResource NormalButton}" Command="{Binding ViewCarsInMaintenanceCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Send Car to Maintenance" Style="{StaticResource NormalButton}" Command="{Binding SendCarToMaintenanceCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="View Maintenance History" Style="{StaticResource NormalButton}" Command="{Binding ViewMaintenanceHistoryCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Return Car from Maintenance" Style="{StaticResource NormalButton}" Command="{Binding ReturnCarFromMaintenanceCommand}"/>
-                    </Border>
-                    <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Exit and Save" Style="{StaticResource NormalButton}" Command="{Binding ExitAndSaveCommand}"/>
-                    </Border>
+                    
                 </StackPanel>
             </Grid>
         </Viewbox>

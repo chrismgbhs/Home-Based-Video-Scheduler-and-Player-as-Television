@@ -13,14 +13,13 @@ using System.Windows.Shapes;
 namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
 {
     /// <summary>
-    /// Interaction logic for MainMenu.xaml
+    /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class MainMenu : Window
+    public partial class Settings : Window
     {
-        public MainMenu()
+        public Settings()
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.MainMenuViewModel();
         }
     }
 }

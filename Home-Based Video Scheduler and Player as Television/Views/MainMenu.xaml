@@ -1,0 +1,63 @@
+﻿<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.MainMenu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.Views"
+        mc:Ignorable="d"
+        Title="
+Home-Based Video Scheduler and Player as Television">
+    <ScrollViewer VerticalScrollBarVisibility="Visible">
+        <Viewbox Stretch="Uniform">
+            <Grid Style="{StaticResource GridStyle}" Height="auto" Width="1920">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Title -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Border -->
+                    <RowDefinition Height="*"/>
+                    <!-- Main Menu fills remaining space -->
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="MAIN MENU" Foreground="White" Style="{StaticResource Title}" Grid.Row="0" Margin="25,40,25,40"/>
+                <Border Style="{StaticResource MainBorder}" Grid.Row="1"/>
+
+                <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="View Available Cars" Style="{StaticResource NormalButton}" Command="{Binding ViewAvailableCarsCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Add Available Car" Style="{StaticResource NormalButton}" Command="{Binding AddACarCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Remove Available Car" Style="{StaticResource NormalButton}" Command="{Binding RemoveACarCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Edit Available Car" Style="{StaticResource NormalButton}" Command="{Binding EditACarCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Add Multiple Available Cars via CSV file" Style="{StaticResource NormalButton}" Command="{Binding AddMultipleCarsViaCSVFileCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="View Rented Cars" Style="{StaticResource NormalButton}" Command="{Binding ViewRentedCarsCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="View Cars in Maintenance" Style="{StaticResource NormalButton}" Command="{Binding ViewCarsInMaintenanceCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Send Car to Maintenance" Style="{StaticResource NormalButton}" Command="{Binding SendCarToMaintenanceCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="View Maintenance History" Style="{StaticResource NormalButton}" Command="{Binding ViewMaintenanceHistoryCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Return Car from Maintenance" Style="{StaticResource NormalButton}" Command="{Binding ReturnCarFromMaintenanceCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Exit and Save" Style="{StaticResource NormalButton}" Command="{Binding ExitAndSaveCommand}"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Viewbox>
+    </ScrollViewer>
+</Window>

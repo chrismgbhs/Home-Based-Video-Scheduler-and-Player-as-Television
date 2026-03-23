@@ -1,9 +1,8 @@
-﻿<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.Schedule"
+<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.Schedule"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels"
-        Title="Schedule Manager"
-        Height="600" Width="1000"
+        Title="Schedule Manager" Height="620" Width="1150"
         Background="{StaticResource BackgroundColor}">
 
     <Window.DataContext>
@@ -13,44 +12,94 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ADD SCHEDULE CONTROLS -->
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,20">
-            <TextBlock Text="Video:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
-            <ComboBox ItemsSource="{Binding Videos}" 
-                      SelectedItem="{Binding SelectedVideo}" 
-                      DisplayMemberPath="Title"
-                      Width="300"/>
+        <TextBlock Grid.Row="0" Text="SCHEDULE" Foreground="White"
+                   FontSize="28" FontWeight="Bold" Margin="0,0,0,16"/>
 
-            <TextBlock Text="Start Time:" VerticalAlignment="Center" Margin="20,0,10,0" Foreground="White"/>
-            <DatePicker SelectedDate="{Binding StartTime}" Width="150"/>
-            <TextBox Text="{Binding StartTime, StringFormat=HH:mm}" Width="80" Margin="5,0,0,0"/>
+        <Border Grid.Row="1" Background="#22FFFFFF" CornerRadius="6"
+                Padding="16,12" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Content="Add" Command="{Binding AddScheduleCommand}" Margin="20,0,0,0"/>
-        </StackPanel>
+                <!-- Video picker -->
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <TextBlock Text="Video" Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,4"/>
+                    <ComboBox ItemsSource="{Binding Videos}"
+                              SelectedItem="{Binding SelectedVideo}"
+                              DisplayMemberPath="Title" FontSize="14"/>
+                </StackPanel>
 
-        <!-- SCHEDULE DATA GRID -->
-        <DataGrid Grid.Row="1"
+                <!-- Custom display title -->
+                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                    <TextBlock Text="On-Screen Title (optional — blank uses video name)"
+                               Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding DisplayTitle, UpdateSourceTrigger=PropertyChanged}"
+                             FontSize="14" Padding="4,3"/>
+                </StackPanel>
+
+                <!-- Date picker -->
+                <StackPanel Grid.Column="2" Margin="0,0,8,0">
+                    <TextBlock Text="Date" Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,4"/>
+                    <DatePicker SelectedDate="{Binding StartDate}" FontSize="14"/>
+                </StackPanel>
+
+                <!-- Time -->
+                <StackPanel Grid.Column="3" Margin="0,0,12,0">
+                    <TextBlock Text="Time (HH:mm:ss)" Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding StartTimeText, UpdateSourceTrigger=PropertyChanged}"
+                             FontSize="14" Padding="4,3"/>
+                </StackPanel>
+
+                <!-- Add button -->
+                <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
+                    <Button Content="  + Add  "
+                            Command="{Binding AddScheduleCommand}"
+                            FontSize="14" FontWeight="Bold"
+                            Background="#378ADD" Foreground="White"
+                            BorderThickness="0" Padding="10,5" Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <DataGrid Grid.Row="2"
                   ItemsSource="{Binding Schedule}"
                   SelectedItem="{Binding SelectedScheduleItem}"
                   AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  Background="White"
-                  Foreground="Black"
-                  FontSize="16"
-                  Margin="0">
-
+                  CanUserAddRows="False" CanUserDeleteRows="False"
+                  IsReadOnly="True"
+                  FontSize="14" RowHeight="36"
+                  GridLinesVisibility="Horizontal"
+                  
+                  BorderThickness="0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Video" Binding="{Binding VideoTitle}" Width="*"/>
-                <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime, StringFormat=MM/dd/yyyy HH:mm}" Width="150"/>
-                <DataGridTextColumn Header="End Time" Binding="{Binding EndTime, StringFormat=MM/dd/yyyy HH:mm}" Width="150"/>
+                <DataGridTextColumn Header="Video Title"
+                                    Binding="{Binding VideoTitle}" Width="*"/>
+                <DataGridTextColumn Header="On-Screen Title"
+                                    Binding="{Binding DisplayTitle}" Width="*"/>
+                <DataGridTextColumn Header="Start Time"
+                                    Binding="{Binding StartTime, StringFormat=MM/dd/yyyy  HH:mm:ss}"
+                                    Width="175"/>
+                <DataGridTextColumn Header="End Time"
+                                    Binding="{Binding EndTime, StringFormat=MM/dd/yyyy  HH:mm:ss}"
+                                    Width="175"/>
+                <DataGridTextColumn Header="Duration"
+                                    Binding="{Binding Duration}" Width="100"/>
             </DataGrid.Columns>
 
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Remove" Command="{Binding DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    <MenuItem Header="Remove Entry"
+                              Command="{Binding DataContext.RemoveScheduleCommand,
+                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>

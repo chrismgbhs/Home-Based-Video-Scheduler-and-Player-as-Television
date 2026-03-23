@@ -1,12 +1,152 @@
-﻿<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.Settings"
+<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.Settings"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.Views"
-        mc:Ignorable="d"
-        Title="Settings" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        xmlns:conv="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.Converters"
+        Title="Settings" Height="560" Width="700"
+        Background="{StaticResource BackgroundColor}">
+
+    <Window.Resources>
+        <conv:EmptyStringToPlaceholderConverter x:Key="EmptyToPlaceholder"/>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28">
+
+            <!-- Header -->
+            <TextBlock Text="SETTINGS" Foreground="White"
+                       FontSize="28" FontWeight="Bold" Margin="0,0,0,24"/>
+
+            <!-- ── CHANNEL LOGO ─────────────────────────────────────────── -->
+            <Border Background="#22FFFFFF" CornerRadius="6"
+                    Padding="20,16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="CHANNEL LOGO" Foreground="#AAAAAA"
+                               FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                    <!-- Preview + path -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                        <Border Width="80" Height="80" Background="#33FFFFFF"
+                                CornerRadius="6" Margin="0,0,16,0">
+                            <Image Source="{Binding LogoPreviewPath}"
+                                   Stretch="Uniform" Margin="6"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding LogoPath,
+                                               Converter={StaticResource EmptyToPlaceholder},
+                                               ConverterParameter='No logo selected'}"
+                                       Foreground="White" FontSize="13"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxWidth="340" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Browse…"
+                                        Command="{Binding BrowseLogoCommand}"
+                                        Background="#378ADD" Foreground="White"
+                                        BorderThickness="0" Padding="12,5"
+                                        FontSize="13" Cursor="Hand" Margin="0,0,8,0"/>
+                                <Button Content="Clear"
+                                        Command="{Binding ClearLogoCommand}"
+                                        Background="#555555" Foreground="White"
+                                        BorderThickness="0" Padding="12,5"
+                                        FontSize="13" Cursor="Hand"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Logo size slider -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Logo size"
+                                   Foreground="White" FontSize="13"
+                                   VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1"
+                                Minimum="40" Maximum="200" TickFrequency="10"
+                                IsSnapToTickEnabled="True"
+                                Value="{Binding LogoSize, Mode=TwoWay}"
+                                VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding LogoSizeLabel}"
+                                   Foreground="#AAAAAA" FontSize="12"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Logo opacity slider -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Logo opacity"
+                                   Foreground="White" FontSize="13"
+                                   VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1"
+                                Minimum="0.1" Maximum="1.0" TickFrequency="0.05"
+                                IsSnapToTickEnabled="True"
+                                Value="{Binding LogoOpacity, Mode=TwoWay}"
+                                VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding LogoOpacityLabel}"
+                                   Foreground="#AAAAAA" FontSize="12"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ── FEATURE TOGGLES ─────────────────────────────────────── -->
+            <Border Background="#22FFFFFF" CornerRadius="6"
+                    Padding="20,16" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="FEATURES" Foreground="#AAAAAA"
+                               FontSize="11" FontWeight="Bold" Margin="0,0,0,14"/>
+
+                    <!-- Overlay toggle -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Show overlay" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="Display title, clock and logo on the player screen"
+                                       Foreground="#666666" FontSize="11" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding OverlayEnabled, Mode=TwoWay}"
+                                  VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Auto commercials toggle -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Auto gap commercials" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="Fill gaps between shows with commercials automatically"
+                                       Foreground="#666666" FontSize="11" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding AutoCommercialsEnabled, Mode=TwoWay}"
+                                  VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Save button -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                        Margin="0,8,0,0">
+                <Button Content="  Save Settings  "
+                        Command="{Binding SaveCommand}"
+                        Background="#378ADD" Foreground="White"
+                        BorderThickness="0" Padding="14,7"
+                        FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
 </Window>

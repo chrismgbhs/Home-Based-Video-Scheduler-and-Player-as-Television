@@ -14,15 +14,16 @@ using System.Windows.Input;
 
 namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
 {
-    public class VideoLibraryViewModel : INotifyPropertyChanged
+    public class CommercialLibraryViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<VideoModel> Videos => VideoStore.Instance.Videos;
+        public ObservableCollection<CommercialModel> Commercials
+            => CommercialStore.Instance.Commercials;
 
-        private VideoModel _selectedVideo;
-        public VideoModel SelectedVideo
+        private CommercialModel _selectedCommercial;
+        public CommercialModel SelectedCommercial
         {
-            get => _selectedVideo;
-            set { _selectedVideo = value; OnPropertyChanged(nameof(SelectedVideo)); }
+            get => _selectedCommercial;
+            set { _selectedCommercial = value; OnPropertyChanged(nameof(SelectedCommercial)); }
         }
 
         private string _statusText = string.Empty;
@@ -39,9 +40,10 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             set { _isBusy = value; OnPropertyChanged(nameof(IsBusy)); }
         }
 
-        public ICommand AddFilesCommand    => new RelayCommand(AddFiles);
-        public ICommand AddFolderCommand   => new RelayCommand(AddFolder);
-        public ICommand RemoveVideoCommand => new RelayCommand(RemoveVideo);
+        public ICommand AddFilesCommand         => new RelayCommand(AddFiles);
+        public ICommand AddFolderCommand        => new RelayCommand(AddFolder);
+        public ICommand RemoveCommercialCommand => new RelayCommand(RemoveCommercial);
+        public ICommand SaveCommand             => new RelayCommand(SaveWeights);
 
         private static readonly string VideoFilter =
             "Video Files|*.mp4;*.mkv;*.avi;*.mov;*.wmv;*.flv;*.ts;*.m4v";
@@ -54,7 +56,7 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             var dialog = new OpenFileDialog
             {
                 Filter      = VideoFilter,
-                Title       = "Select Video Files",
+                Title       = "Select Commercial Files",
                 Multiselect = true
             };
             if (dialog.ShowDialog() != true) return;
@@ -96,7 +98,7 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
         private async void AddPaths(string[] paths)
         {
             var existing = new HashSet<string>(
-                Videos.Select(v => v.FilePath),
+                Commercials.Select(c => c.FilePath),
                 StringComparer.OrdinalIgnoreCase);
 
             var newPaths = paths.Where(p => !existing.Contains(p)).ToArray();
@@ -115,27 +117,36 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
 
             foreach (var path in newPaths)
             {
-                Videos.Add(new VideoModel
+                Commercials.Add(new CommercialModel
                 {
-                    Id       = VideoStore.Instance.NextId(),
+                    Id       = CommercialStore.Instance.NextId(),
                     Title    = Path.GetFileNameWithoutExtension(path),
                     FilePath = path,
-                    Duration = durations.TryGetValue(path, out var d) ? d : TimeSpan.Zero
+                    Duration = durations.TryGetValue(path, out var d) ? d : TimeSpan.Zero,
+                    Weight   = 1
                 });
             }
 
-            VideoStore.Instance.SaveVideos();
+            CommercialStore.Instance.Save();
             IsBusy     = false;
-            StatusText = $"Added {newPaths.Length} video(s). Total: {Videos.Count}";
+            StatusText = $"Added {newPaths.Length} commercial(s). Total: {Commercials.Count}";
         }
 
-        private void RemoveVideo()
+        private void RemoveCommercial()
         {
-            if (SelectedVideo == null) return;
-            Videos.Remove(SelectedVideo);
-            SelectedVideo = null;
-            VideoStore.Instance.SaveVideos();
-            StatusText = $"Removed. Total: {Videos.Count}";
+            if (SelectedCommercial == null) return;
+            Commercials.Remove(SelectedCommercial);
+            SelectedCommercial = null;
+            CommercialStore.Instance.Save();
+            StatusText = $"Removed. Total: {Commercials.Count}";
+        }
+
+        private void SaveWeights()
+        {
+            foreach (var c in Commercials)
+                c.Weight = Math.Max(1, Math.Min(10, c.Weight));
+            CommercialStore.Instance.Save();
+            StatusText = "Weights saved.";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

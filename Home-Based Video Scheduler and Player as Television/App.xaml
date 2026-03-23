@@ -1,124 +1,246 @@
-﻿<Application x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.App"
+<Application x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television"
              xmlns:conv="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.Converters"
              StartupUri="Views\MainMenu.xaml">
     <Application.Resources>
-        <!--GLOBAL STYLE SETTINGS-->
+
+        <!-- ── SHARED COLORS ─────────────────────────────────────────────── -->
         <FontFamily x:Key="MainFont">Arial</FontFamily>
-        <SolidColorBrush x:Key="HorizontalLineColor" Color="White" />
-        <SolidColorBrush x:Key="ButtonBorderColor" Color="White" />
-        <SolidColorBrush x:Key="ElementBorderColor" Color="White" />
-        <SolidColorBrush x:Key="TextBoxBorderColor" Color="White" />
-        <SolidColorBrush x:Key="TextForegroundColor" Color="White"/>
-        <SolidColorBrush x:Key="BackgroundColor" Color="#FF14141F"/>
+        <SolidColorBrush x:Key="HorizontalLineColor"  Color="White"/>
+        <SolidColorBrush x:Key="ButtonBorderColor"    Color="White"/>
+        <SolidColorBrush x:Key="ElementBorderColor"   Color="White"/>
+        <SolidColorBrush x:Key="TextBoxBorderColor"   Color="White"/>
+        <SolidColorBrush x:Key="TextForegroundColor"  Color="White"/>
+        <SolidColorBrush x:Key="BackgroundColor"      Color="#FF14141F"/>
+
+        <!-- Dark theme palette used by newer views -->
+        <SolidColorBrush x:Key="DarkBg"       Color="#0D0D14"/>
+        <SolidColorBrush x:Key="DarkCard"     Color="#161622"/>
+        <SolidColorBrush x:Key="DarkBorder"   Color="#2A2A3A"/>
+        <SolidColorBrush x:Key="DarkInput"    Color="#1E1E2E"/>
+        <SolidColorBrush x:Key="AccentRed"    Color="#E8312A"/>
+        <SolidColorBrush x:Key="MutedText"    Color="#9999AA"/>
+
         <HorizontalAlignment x:Key="MainMenuHorizontalAlignment">Center</HorizontalAlignment>
 
-        <!--GRID!!-->
+        <!-- ── CONVERTERS ────────────────────────────────────────────────── -->
+        <conv:NullToBoolConverter                    x:Key="NullToBoolConverter"/>
+        <conv:NullOrEmptyToVisibilityConverter        x:Key="NullOrEmptyToVisibilityConverter"/>
+        <conv:StringToVisibilityConverter             x:Key="StringToVisibilityConverter"/>
+        <BooleanToVisibilityConverter                 x:Key="BoolToVis"/>
+
+        <!-- ── LEGACY KEYED STYLES (keep for old views) ──────────────────── -->
         <Style x:Key="GridStyle" TargetType="Grid">
             <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
         </Style>
-
-        <!--DATA GRID!!-->
         <Style x:Key="DataGridHeader" TargetType="DataGridColumnHeader">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="25.333"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily"  Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"    Value="25.333"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
         </Style>
-
         <Style x:Key="DataGridText" TargetType="DataGrid">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="25.333"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="Margin" Value="25,0,25,35"/>
+            <Setter Property="FontFamily"  Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"    Value="25.333"/>
+            <Setter Property="Foreground"  Value="Black"/>
+            <Setter Property="Margin"      Value="25,0,25,35"/>
         </Style>
-
-        <!--TEXT STYLES!!-->
         <Style x:Key="Header" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextForegroundColor}"/>
-            <Setter Property="FontSize" Value="35.333"/>
-            <Setter Property="Margin" Value="25,0,25,35"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily"  Value="{StaticResource MainFont}"/>
+            <Setter Property="Foreground"  Value="{StaticResource TextForegroundColor}"/>
+            <Setter Property="FontSize"    Value="35.333"/>
+            <Setter Property="Margin"      Value="25,0,25,35"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
         </Style>
-
         <Style x:Key="BodyTextStyle" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="25.333"/>
-            <Setter Property="Margin" Value="25,0,25,20"/>
+            <Setter Property="FontFamily"  Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"    Value="25.333"/>
+            <Setter Property="Margin"      Value="25,0,25,20"/>
         </Style>
-
         <Style x:Key="Title" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="45.333"/>
-            <Setter Property="Margin" Value="25,0,25,40"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily"  Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"    Value="45.333"/>
+            <Setter Property="Margin"      Value="25,0,25,40"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
         </Style>
-
-        <!--TEXT BOXES!!-->
         <Style x:Key="BodyTextBox" TargetType="TextBox">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="25.333"/>
+            <Setter Property="FontFamily"     Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"       Value="25.333"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Background"     Value="LightGray"/>
         </Style>
-
-        <!--BUTTONS!!-->
         <Style x:Key="MajorButton" TargetType="Button">
-            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="25.333"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily"     Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize"       Value="25.333"/>
+            <Setter Property="FontWeight"     Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background"     Value="White"/>
         </Style>
         <Style x:Key="NormalButton" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
-            <Setter Property="FontSize" Value="35.333"/>
-            <Setter Property="Padding" Value="5,0,5,0"/>
+            <Setter Property="FontSize"   Value="35.333"/>
+            <Setter Property="Padding"    Value="5,0,5,0"/>
         </Style>
-
-        <!--BORDER-->
         <Style x:Key="MainBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{StaticResource HorizontalLineColor}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource HorizontalLineColor}"/>
             <Setter Property="BorderThickness" Value="0,10,0,10"/>
-            <Setter Property="Margin" Value="0,20,0,20"/>
+            <Setter Property="Margin"          Value="0,20,0,20"/>
         </Style>
-
         <Style x:Key="TextBoxBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorderColor}"/>
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="BorderThickness" Value="5,5,5,5"/>
-            <Setter Property="Margin" Value="25,0,25,20"/>
-            <Setter Property="CornerRadius" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderBrush"     Value="White"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Margin"          Value="25,0,25,20"/>
+            <Setter Property="CornerRadius"    Value="5"/>
+            <Setter Property="VerticalAlignment"   Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
-
         <Style x:Key="ElementBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{StaticResource ElementBorderColor}"/>
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="BorderThickness" Value="5,5,5,5"/>
-            <Setter Property="CornerRadius" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderBrush"     Value="White"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="CornerRadius"    Value="5"/>
+            <Setter Property="VerticalAlignment"   Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
-
         <Style x:Key="MajorButtonBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderColor}"/>
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="BorderThickness" Value="5,5,5,5"/>
-            <Setter Property="Margin" Value="25,35,25,20"/>
-            <Setter Property="CornerRadius" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderBrush"     Value="White"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Margin"          Value="25,35,25,20"/>
+            <Setter Property="CornerRadius"    Value="5"/>
+            <Setter Property="VerticalAlignment"   Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
         <Style x:Key="NormalButtonBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderColor}"/>
-            <Setter Property="BorderThickness" Value="5,5,5,5"/>
-            <Setter Property="Margin" Value="25,0,25,20"/>
-            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource ButtonBorderColor}"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Margin"          Value="25,0,25,20"/>
+            <Setter Property="CornerRadius"    Value="5"/>
         </Style>
-        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+
+        <!-- ── GLOBAL IMPLICIT DARK STYLES ───────────────────────────────── -->
+        <!-- These apply to ALL controls app-wide with no x:Key needed      -->
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background"       Value="#1E1E2E"/>
+            <Setter Property="Foreground"       Value="White"/>
+            <Setter Property="CaretBrush"       Value="White"/>
+            <Setter Property="BorderBrush"      Value="#2A2A3A"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="4,3"/>
+            <Setter Property="SelectionBrush"   Value="#E8312A"/>
+        </Style>
+
+        <!-- DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Background"  Value="#1E1E2E"/>
+            <Setter Property="Foreground"  Value="White"/>
+            <Setter Property="BorderBrush" Value="#2A2A3A"/>
+        </Style>
+        <Style TargetType="DatePickerTextBox">
+            <Setter Property="Background"  Value="#1E1E2E"/>
+            <Setter Property="Foreground"  Value="White"/>
+            <Setter Property="BorderBrush" Value="#2A2A3A"/>
+            <Setter Property="SelectionBrush" Value="#E8312A"/>
+        </Style>
+
+        <!-- ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background"       Value="#1E1E2E"/>
+            <Setter Property="Foreground"       Value="White"/>
+            <Setter Property="BorderBrush"      Value="#2A2A3A"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="6,4"/>
+        </Style>
+
+        <!-- ComboBoxItem -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#1E1E2E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding"    Value="8,4"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2A2A3E"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E8312A"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background"            Value="#161622"/>
+            <Setter Property="Foreground"            Value="White"/>
+            <Setter Property="BorderBrush"           Value="#2A2A3A"/>
+            <Setter Property="BorderThickness"       Value="1"/>
+            <Setter Property="RowBackground"         Value="#161622"/>
+            <Setter Property="AlternatingRowBackground" Value="#1A1A28"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#2A2A3A"/>
+            <Setter Property="VerticalGridLinesBrush"   Value="#2A2A3A"/>
+            <Setter Property="ColumnHeaderHeight"    Value="36"/>
+            <Setter Property="RowHeight"             Value="34"/>
+            <Setter Property="FontSize"              Value="13"/>
+        </Style>
+
+        <!-- DataGridColumnHeader -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background"   Value="#0D0D1A"/>
+            <Setter Property="Foreground"   Value="#9999AA"/>
+            <Setter Property="BorderBrush"  Value="#2A2A3A"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding"      Value="8,0"/>
+            <Setter Property="FontFamily"   Value="Consolas"/>
+            <Setter Property="FontSize"     Value="11"/>
+            <Setter Property="FontWeight"   Value="Bold"/>
+        </Style>
+
+        <!-- DataGridRow -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1E1E2E"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#2A1010"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGridCell -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="8,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ScrollBar (thin dark scrollbars) -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#0D0D14"/>
+            <Setter Property="Foreground" Value="#2A2A3A"/>
+            <Setter Property="Width"      Value="8"/>
+        </Style>
+
+        <!-- CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Slider -->
+        <Style TargetType="Slider">
+            <Setter Property="Foreground" Value="#E8312A"/>
+        </Style>
+
     </Application.Resources>
 </Application>

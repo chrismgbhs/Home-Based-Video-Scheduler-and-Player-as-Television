@@ -88,11 +88,18 @@
                 <DataGridTextColumn Header="Start Time"
                                     Binding="{Binding StartTime, StringFormat=MM/dd/yyyy  HH:mm:ss}"
                                     Width="175"/>
-                <DataGridTextColumn Header="End Time"
+                <DataGridTextColumn Header="End Time (Video)"
                                     Binding="{Binding EndTime, StringFormat=MM/dd/yyyy  HH:mm:ss}"
                                     Width="175"/>
-                <DataGridTextColumn Header="Duration"
-                                    Binding="{Binding Duration}" Width="100"/>
+                <DataGridTextColumn Header="True End Time (w/ Ads)"
+                                    Binding="{Binding TrueEndTimeDisplay}"
+                                    Width="185"/>
+                <DataGridTextColumn Header="Show Duration"
+                                    Binding="{Binding Duration}" Width="120"/>
+                <DataGridTextColumn Header="Ad Time"
+                                    Binding="{Binding AdTime}" Width="100"/>
+                <DataGridTextColumn Header="Total Air Time"
+                                    Binding="{Binding TotalAirTime}" Width="120"/>
             </DataGrid.Columns>
 
             <DataGrid.ContextMenu>

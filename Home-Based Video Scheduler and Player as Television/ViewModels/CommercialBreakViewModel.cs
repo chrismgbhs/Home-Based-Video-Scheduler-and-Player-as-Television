@@ -11,10 +11,9 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
 {
     public class CommercialBreakViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<ScheduleItem>   Shows       => VideoStore.Instance.Schedule;
+        public ObservableCollection<ScheduleItem>    Shows       => VideoStore.Instance.Schedule;
         public ObservableCollection<CommercialModel> Commercials => CommercialStore.Instance.Commercials;
 
-        // ── Selected show ─────────────────────────────────────────────────────────
         private ScheduleItem _selectedShow;
         public ScheduleItem SelectedShow
         {
@@ -29,7 +28,6 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             }
         }
 
-        // Total duration of selected show in seconds (drives timeline width math)
         public double ShowDurationSeconds =>
             _selectedShow != null
                 ? (_selectedShow.EndTime - _selectedShow.StartTime).TotalSeconds
@@ -40,15 +38,13 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
                 ? $"{(int)(_selectedShow.EndTime - _selectedShow.StartTime).TotalMinutes} min"
                 : "—";
 
-        // ── Breaks ────────────────────────────────────────────────────────────────
-        private ObservableCollection<CommercialBreak> _breaksForShow = new();
-        public ObservableCollection<CommercialBreak> BreaksForShow
+        private ObservableCollection<CommercialBreakDisplay> _breaksForShow = new();
+        public ObservableCollection<CommercialBreakDisplay> BreaksForShow
         {
             get => _breaksForShow;
             set { _breaksForShow = value; OnPropertyChanged(nameof(BreaksForShow)); }
         }
 
-        // ── Add break inputs ──────────────────────────────────────────────────────
         private CommercialModel _selectedCommercial;
         public CommercialModel SelectedCommercial
         {
@@ -63,8 +59,8 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             set { _offsetText = value; OnPropertyChanged(nameof(OffsetText)); }
         }
 
-        private CommercialBreak _selectedBreak;
-        public CommercialBreak SelectedBreak
+        private CommercialBreakDisplay _selectedBreak;
+        public CommercialBreakDisplay SelectedBreak
         {
             get => _selectedBreak;
             set { _selectedBreak = value; OnPropertyChanged(nameof(SelectedBreak)); }
@@ -85,15 +81,72 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             { MessageBox.Show("Enter a valid offset (HH:mm:ss).", "Invalid Offset", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
 
             var showDuration = SelectedShow.EndTime - SelectedShow.StartTime;
-            if (offset >= showDuration)
-            { MessageBox.Show("Offset exceeds show duration.", "Invalid Offset", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
 
-            bool duplicate = CommercialBreakStore.Instance.Breaks.Any(b =>
-                b.ShowFilePath == SelectedShow.FilePath &&
-                b.ShowStartTime == SelectedShow.StartTime &&
-                b.Offset == offset);
-            if (duplicate)
-            { MessageBox.Show("A break already exists at that offset.", "Duplicate", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+            // Offset must be within show video duration
+            if (offset >= showDuration)
+            {
+                MessageBox.Show(
+                    $"Offset {offset:hh\\:mm\\:ss} exceeds the show duration of {showDuration:hh\\:mm\\:ss}.",
+                    "Invalid Offset", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // New commercial end = offset + its duration
+            var newCommercialEnd = offset + SelectedCommercial.Duration;
+
+            // Check overlap with existing breaks for this show
+            var existingBreaks = CommercialBreakStore.Instance.Breaks
+                .Where(b => b.ShowFilePath  == SelectedShow.FilePath &&
+                            b.ShowStartTime == SelectedShow.StartTime)
+                .ToList();
+
+            foreach (var existing in existingBreaks)
+            {
+                var existingEnd = CommercialBreakStore.Instance.GetBreakEndOffset(existing);
+
+                // [offset, newEnd) overlaps [existing.Offset, existingEnd) ?
+                if (offset < existingEnd && newCommercialEnd > existing.Offset)
+                {
+                    MessageBox.Show(
+                        $"This commercial overlaps with '{existing.CommercialTitle}' " +
+                        $"(inserted at {existing.OffsetDisplay}, ends at {existingEnd:hh\\:mm\\:ss}).\n\n" +
+                        $"Please choose an offset at {existingEnd:hh\\:mm\\:ss} or later.",
+                        "Commercial Overlap",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            // Check: would adding this commercial push TrueEndTime past the next show's start?
+            var nextShow = VideoStore.Instance.Schedule
+                .Where(s => s.StartTime > SelectedShow.StartTime)
+                .OrderBy(s => s.StartTime)
+                .FirstOrDefault();
+
+            if (nextShow != null)
+            {
+                // Simulate what TrueEndTime would be after adding this break
+                var currentTrueEnd = CommercialBreakStore.Instance.GetTrueEndTime(SelectedShow);
+                var newTrueEnd     = currentTrueEnd + SelectedCommercial.Duration;
+
+                if (newTrueEnd > nextShow.StartTime)
+                {
+                    var maxAdTime = nextShow.StartTime - SelectedShow.EndTime;
+                    var maxAdStr  = maxAdTime > TimeSpan.Zero
+                        ? maxAdTime.ToString(@"hh\:mm\:ss")
+                        : "0s";
+
+                    MessageBox.Show(
+                        $"Cannot add this commercial.\n\n" +
+                        $"It would push '{SelectedShow.EffectiveTitle}' to end at {newTrueEnd:HH:mm:ss}, " +
+                        $"which overlaps with '{nextShow.EffectiveTitle}' " +
+                        $"starting at {nextShow.StartTime:HH:mm:ss}.\n\n" +
+                        $"Maximum allowed ad time for this show: {maxAdStr}.",
+                        "Conflict With Next Show",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
 
             CommercialBreakStore.Instance.Breaks.Add(new CommercialBreak
             {
@@ -105,15 +158,18 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
                 CommercialFilePath = SelectedCommercial.FilePath,
                 Offset             = offset
             });
+
             CommercialBreakStore.Instance.Save();
             RefreshBreaks();
-            OffsetText = (offset + SelectedCommercial.Duration).ToString(@"hh\:mm\:ss");
+
+            // Auto-advance offset past this commercial
+            OffsetText = newCommercialEnd.ToString(@"hh\:mm\:ss");
         }
 
         private void RemoveBreak()
         {
             if (SelectedBreak == null) return;
-            CommercialBreakStore.Instance.Breaks.Remove(SelectedBreak);
+            CommercialBreakStore.Instance.Breaks.Remove(SelectedBreak.Break);
             CommercialBreakStore.Instance.Save();
             RefreshBreaks();
         }
@@ -121,13 +177,55 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
         private void RefreshBreaks()
         {
             if (_selectedShow == null) { BreaksForShow = new(); return; }
-            BreaksForShow = CommercialBreakStore.Instance.BreaksForShow(
+
+            var rawBreaks = CommercialBreakStore.Instance.BreaksForShow(
                 _selectedShow.FilePath, _selectedShow.StartTime);
+
+            // Wrap each break with its commercial duration for display
+            var display = rawBreaks.Select(b =>
+            {
+                var commercial = CommercialStore.Instance.Commercials
+                    .FirstOrDefault(c => c.Id == b.CommercialId);
+                return new CommercialBreakDisplay(b, commercial?.Duration ?? TimeSpan.Zero);
+            });
+
+            BreaksForShow = new ObservableCollection<CommercialBreakDisplay>(display);
             OnPropertyChanged(nameof(ShowDurationSeconds));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+    /// <summary>
+    /// Display wrapper for CommercialBreak that includes the commercial's duration.
+    /// </summary>
+    public class CommercialBreakDisplay
+    {
+        public CommercialBreak Break          { get; }
+        public string CommercialTitle         => Break.CommercialTitle;
+        public string OffsetDisplay           => Break.OffsetDisplay;
+        public TimeSpan CommercialDuration    { get; }
+        public string DurationDisplay         =>
+            CommercialDuration == TimeSpan.Zero ? "—"
+            : CommercialDuration.TotalHours >= 1
+                ? $"{(int)CommercialDuration.TotalHours}h {CommercialDuration.Minutes}m {CommercialDuration.Seconds}s"
+                : $"{CommercialDuration.Minutes}m {CommercialDuration.Seconds}s";
+
+        public string EndsAtDisplay
+        {
+            get
+            {
+                var endsAt = Break.Offset + CommercialDuration;
+                return endsAt.ToString(@"hh\:mm\:ss");
+            }
+        }
+
+        public CommercialBreakDisplay(CommercialBreak b, TimeSpan duration)
+        {
+            Break               = b;
+            CommercialDuration  = duration;
+        }
     }
 }

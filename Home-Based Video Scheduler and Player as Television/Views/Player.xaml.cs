@@ -15,16 +15,28 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
             int x, int y, int cx, int cy, uint uFlags);
 
         private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-        private const uint SWP_NOMOVE     = 0x0002;
-        private const uint SWP_NOSIZE     = 0x0001;
-        private const uint SWP_NOACTIVATE = 0x0010;
+        private const uint SWP_NOMOVE = 0x0002, SWP_NOSIZE = 0x0001, SWP_NOACTIVATE = 0x0010;
 
         private OverlayWindow _overlay;
 
         public Player()
         {
             InitializeComponent();
-            DataContext = PlayerViewModel.Instance;
+
+            try
+            {
+                DataContext = PlayerViewModel.Instance;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Failed to initialize the video player.\n\nMake sure LibVLC is correctly installed.\n\nDetails: {ex.Message}",
+                    "Player Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Close immediately — don't leave a broken window open
+                Dispatcher.BeginInvoke(new Action(Close));
+                return;
+            }
+
             Loaded  += Player_Loaded;
             Closing += Player_Closing;
         }
@@ -34,23 +46,29 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
             SchedulerService.Instance.IsPlayerOpen = true;
 
             WindowState = WindowState.Normal;
-            Left   = 0;
-            Top    = 0;
+            Left = 0; Top = 0;
             Width  = SystemParameters.PrimaryScreenWidth;
             Height = SystemParameters.PrimaryScreenHeight;
 
-            // Step 1: attach render surface
-            VideoViewControl.MediaPlayer = PlayerViewModel.Instance.MediaPlayer;
+            try
+            {
+                VideoViewControl.MediaPlayer = PlayerViewModel.Instance.MediaPlayer;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Failed to attach video surface.\n\nDetails: {ex.Message}",
+                    "Player Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+                return;
+            }
 
-            // Step 2: overlay
+            // Overlay
             _overlay = new OverlayWindow
             {
                 DataContext   = PlayerViewModel.Instance,
                 ShowInTaskbar = false,
-                Left          = Left,
-                Top           = Top,
-                Width         = Width,
-                Height        = Height
+                Left = Left, Top = Top, Width = Width, Height = Height
             };
             _overlay.SourceInitialized += (s, _) => BringOverlayToFront();
             _overlay.Show();
@@ -59,19 +77,25 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
             SizeChanged     += (s, _) => SyncOverlay();
             Activated       += (s, _) => BringOverlayToFront();
 
-            // Step 3: defer playback until AFTER WPF finishes all layout/render passes
-            // so VideoView's HWND is fully bound before VLC tries to render into it
+            // Defer playback until VideoView HWND is fully bound
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
             {
-                PlayerViewModel.Instance.OnPlayerWindowReady();
+                try { PlayerViewModel.Instance.OnPlayerWindowReady(); }
+                catch { /* playback will retry on next scheduler tick */ }
             }));
         }
 
         private void Player_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             SchedulerService.Instance.IsPlayerOpen = false;
-            PlayerViewModel.Instance.Stop();
-            VideoViewControl.MediaPlayer = null;
+
+            try
+            {
+                PlayerViewModel.Instance.Stop();
+                VideoViewControl.MediaPlayer = null;
+            }
+            catch { }
+
             _overlay?.Close();
             _overlay = null;
         }
@@ -79,10 +103,8 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
         private void SyncOverlay()
         {
             if (_overlay == null) return;
-            _overlay.Left   = Left;
-            _overlay.Top    = Top;
-            _overlay.Width  = Width;
-            _overlay.Height = Height;
+            _overlay.Left = Left; _overlay.Top = Top;
+            _overlay.Width = Width; _overlay.Height = Height;
             BringOverlayToFront();
         }
 

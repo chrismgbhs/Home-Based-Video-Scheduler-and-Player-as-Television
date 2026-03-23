@@ -54,6 +54,35 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Services
             }
         }
 
+        /// <summary>
+        /// Returns the real end time of a show = video EndTime + all commercial durations.
+        /// This is the time the NEXT show can start at the earliest.
+        /// </summary>
+        public DateTime GetTrueEndTime(ScheduleItem show)
+        {
+            var breaks = BreaksForShow(show.FilePath, show.StartTime);
+            var totalAdTime = TimeSpan.Zero;
+            foreach (var b in breaks)
+            {
+                var commercial = CommercialStore.Instance.Commercials
+                    .FirstOrDefault(c => c.Id == b.CommercialId);
+                if (commercial != null)
+                    totalAdTime += commercial.Duration;
+            }
+            return show.EndTime + totalAdTime;
+        }
+
+        /// <summary>
+        /// Returns the end time of a commercial break slot starting at offset,
+        /// i.e. offset + commercial duration. Used for overlap checking.
+        /// </summary>
+        public TimeSpan GetBreakEndOffset(CommercialBreak b)
+        {
+            var commercial = CommercialStore.Instance.Commercials
+                .FirstOrDefault(c => c.Id == b.CommercialId);
+            return commercial != null ? b.Offset + commercial.Duration : b.Offset;
+        }
+
         public ObservableCollection<CommercialBreak> BreaksForShow(string showFilePath, DateTime showStartTime)
         {
             return new ObservableCollection<CommercialBreak>(

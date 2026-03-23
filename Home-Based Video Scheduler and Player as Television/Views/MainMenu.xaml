@@ -9,22 +9,23 @@
         Background="#FF0D0D14">
 
     <Window.Resources>
-        <!-- Broadcast red accent -->
-        <SolidColorBrush x:Key="AccentRed"    Color="#E8312A"/>
-        <SolidColorBrush x:Key="AccentAmber"  Color="#F0A500"/>
-        <SolidColorBrush x:Key="DimText"      Color="#666677"/>
-        <SolidColorBrush x:Key="CardBg"       Color="#161622"/>
-        <SolidColorBrush x:Key="CardBorder"   Color="#2A2A3A"/>
+        <SolidColorBrush x:Key="AccentRed"   Color="#E8312A"/>
+        <SolidColorBrush x:Key="AccentAmber" Color="#F0A500"/>
+        <SolidColorBrush x:Key="CardBg"      Color="#161622"/>
+        <SolidColorBrush x:Key="CardBorder"  Color="#2A2A3A"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Invert bool converter inline via style trigger -->
 
         <Style x:Key="NavButton" TargetType="Button">
-            <Setter Property="Background"   Value="#161622"/>
-            <Setter Property="Foreground"   Value="White"/>
-            <Setter Property="BorderBrush"  Value="#2A2A3A"/>
+            <Setter Property="Background"      Value="#161622"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderBrush"     Value="#2A2A3A"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor"       Value="Hand"/>
-            <Setter Property="FontFamily"   Value="Consolas"/>
-            <Setter Property="FontSize"     Value="15"/>
-            <Setter Property="Padding"      Value="0"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="FontFamily"      Value="Consolas"/>
+            <Setter Property="FontSize"        Value="15"/>
+            <Setter Property="Padding"         Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -50,15 +51,25 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Show card style — highlighted red if currently airing -->
+        <Style x:Key="ShowCard" TargetType="Border">
+            <Setter Property="Background"      Value="#161622"/>
+            <Setter Property="BorderBrush"     Value="#2A2A3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius"    Value="6"/>
+            <Setter Property="Padding"         Value="14,10"/>
+            <Setter Property="Margin"          Value="0,0,0,4"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ── LEFT PANEL ─────────────────────────────────────────────────── -->
+        <!-- ── LEFT PANEL ────────────────────────────────────────────────────── -->
         <Border Grid.Column="0" Background="#0D0D14"
                 BorderBrush="#1A1A28" BorderThickness="0,0,1,0">
             <Grid>
@@ -68,36 +79,25 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Station logo / title area -->
-                <StackPanel Grid.Row="0" Margin="28,40,28,32">
-                    <TextBlock Text="⬛ ON AIR"
-                               FontFamily="Consolas" FontSize="11" FontWeight="Bold"
-                               Foreground="#E8312A"
-                               Margin="0,0,0,16"/>
-                    <TextBlock Text="HOME TV"
-                               FontFamily="Consolas" FontSize="36" FontWeight="Bold"
-                               Foreground="White" LineHeight="38"/>
-                    <TextBlock Text="BROADCAST CONTROL"
-                               FontFamily="Consolas" FontSize="11"
-                               Foreground="#666677"
-                               Margin="0,4,0,0"/>
-                    <Rectangle Height="1" Fill="#E8312A" Margin="0,20,0,0" Opacity="0.6"/>
+                <StackPanel Grid.Row="0" Margin="24,36,24,28">
+                    <TextBlock Text="⬛ ON AIR" FontFamily="Consolas" FontSize="11"
+                               FontWeight="Bold" Foreground="#E8312A" Margin="0,0,0,14"/>
+                    <TextBlock Text="HOME TV" FontFamily="Consolas" FontSize="34"
+                               FontWeight="Bold" Foreground="White" LineHeight="36"/>
+                    <TextBlock Text="BROADCAST CONTROL" FontFamily="Consolas" FontSize="11"
+                               Foreground="#666677" Margin="0,4,0,0"/>
+                    <Rectangle Height="1" Fill="#E8312A" Margin="0,18,0,0" Opacity="0.6"/>
                 </StackPanel>
 
-                <!-- Nav buttons -->
-                <StackPanel Grid.Row="1" Margin="20,0,20,0">
-
+                <StackPanel Grid.Row="1" Margin="16,0,16,0">
                     <TextBlock Text="PLAYBACK" FontFamily="Consolas" FontSize="10"
                                Foreground="#888899" Margin="8,0,0,8"/>
-
-                    <Button Height="52" Margin="0,0,0,4"
-                            Command="{Binding ViewPlayerCommand}"
+                    <Button Height="52" Margin="0,0,0,4" Command="{Binding ViewPlayerCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="▶" Foreground="#E8312A"
-                                           FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="▶" Foreground="#E8312A" FontSize="14"
+                                           VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Video Player" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Open broadcast view" FontSize="10" Foreground="#666677"/>
@@ -105,14 +105,11 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-
-                    <Button Height="52" Margin="0,0,0,16"
-                            Command="{Binding SchedulerCommand}"
+                    <Button Height="52" Margin="0,0,0,16" Command="{Binding SchedulerCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📅" FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="📅" FontSize="14" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Schedule" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Manage show lineup" FontSize="10" Foreground="#666677"/>
@@ -123,14 +120,11 @@
 
                     <TextBlock Text="LIBRARY" FontFamily="Consolas" FontSize="10"
                                Foreground="#888899" Margin="8,0,0,8"/>
-
-                    <Button Height="52" Margin="0,0,0,4"
-                            Command="{Binding VideoLibraryCommand}"
+                    <Button Height="52" Margin="0,0,0,4" Command="{Binding VideoLibraryCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="🎬" FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="🎬" FontSize="14" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Video Library" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Add and manage videos" FontSize="10" Foreground="#666677"/>
@@ -138,14 +132,11 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-
-                    <Button Height="52" Margin="0,0,0,4"
-                            Command="{Binding CommercialLibraryCommand}"
+                    <Button Height="52" Margin="0,0,0,4" Command="{Binding CommercialLibraryCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📢" FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="📢" FontSize="14" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Commercial Library" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Manage ad clips" FontSize="10" Foreground="#666677"/>
@@ -153,14 +144,11 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-
-                    <Button Height="52" Margin="0,0,0,16"
-                            Command="{Binding CommercialBreakCommand}"
+                    <Button Height="52" Margin="0,0,0,16" Command="{Binding CommercialBreakCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="⏸" FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="⏸" FontSize="14" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Commercial Breaks" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Set ad insertion points" FontSize="10" Foreground="#666677"/>
@@ -171,14 +159,11 @@
 
                     <TextBlock Text="SYSTEM" FontFamily="Consolas" FontSize="10"
                                Foreground="#888899" Margin="8,0,0,8"/>
-
-                    <Button Height="52" Margin="0,0,0,4"
-                            Command="{Binding SettingsCommand}"
+                    <Button Height="52" Margin="0,0,0,4" Command="{Binding SettingsCommand}"
                             Style="{StaticResource NavButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="⚙" FontSize="14" VerticalAlignment="Center"
-                                           Margin="0,0,14,0"/>
+                                <TextBlock Text="⚙" FontSize="14" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                 <StackPanel>
                                     <TextBlock Text="Settings" FontSize="14" Foreground="White"/>
                                     <TextBlock Text="Logo, overlays, preferences" FontSize="10" Foreground="#666677"/>
@@ -188,104 +173,288 @@
                     </Button>
                 </StackPanel>
 
-                <!-- Bottom version tag -->
-                <TextBlock Grid.Row="2"
-                           Text="HOME-BASED TV  v1.0"
-                           FontFamily="Consolas" FontSize="10"
-                           Foreground="#666677"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,20"/>
+                <TextBlock Grid.Row="2" Text="HOME-BASED TV  v1.0"
+                           FontFamily="Consolas" FontSize="10" Foreground="#333344"
+                           HorizontalAlignment="Center" Margin="0,0,0,20"/>
             </Grid>
         </Border>
 
-        <!-- ── RIGHT PANEL — info / splash ───────────────────────────────── -->
+        <!-- ── RIGHT PANEL — schedule dashboard ──────────────────────────────── -->
         <Grid Grid.Column="1" Background="#0D0D14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <!-- Subtle grid texture lines -->
-            <Canvas>
-                <Line X1="0" Y1="200"  X2="2000" Y2="200"  Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="0" Y1="400"  X2="2000" Y2="400"  Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="0" Y1="600"  X2="2000" Y2="600"  Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="200"  Y1="0" X2="200"  Y2="1200" Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="400"  Y1="0" X2="400"  Y2="1200" Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="600"  Y1="0" X2="600"  Y2="1200" Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="800"  Y1="0" X2="800"  Y2="1200" Stroke="#111120" StrokeThickness="1"/>
-                <Line X1="1000" Y1="0" X2="1000" Y2="1200" Stroke="#111120" StrokeThickness="1"/>
-            </Canvas>
+            <!-- Top bar -->
+            <Border Grid.Row="0" Background="#0D0D14"
+                    BorderBrush="#1A1A28" BorderThickness="0,0,0,1"
+                    Padding="28,20,28,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <!-- Center content -->
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="STATION CONTROL"
-                           FontFamily="Consolas" FontSize="13"
-                           Foreground="#666677"
-                           HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="BROADCAST SCHEDULE" FontFamily="Consolas"
+                                   FontSize="11" Foreground="#E8312A" Margin="0,0,0,4"/>
+                        <TextBlock Text="Full Programme Listing"
+                                   FontFamily="Consolas" FontSize="20"
+                                   FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
 
-                <!-- Big signal icon -->
-                <Border Width="160" Height="160"
-                        BorderBrush="#1A1A28" BorderThickness="1"
-                        CornerRadius="80"
-                        HorizontalAlignment="Center"
-                        Margin="0,0,0,32">
-                    <Border.Background>
-                        <RadialGradientBrush>
-                            <GradientStop Color="#1A0808" Offset="0"/>
-                            <GradientStop Color="#0D0D14" Offset="1"/>
-                        </RadialGradientBrush>
-                    </Border.Background>
-                    <TextBlock Text="📡" FontSize="64"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
-                </Border>
+                    <!-- Stat pills -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Border Background="#161622" BorderBrush="#2A2A3A"
+                                BorderThickness="1" CornerRadius="4"
+                                Padding="14,8" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding ScheduledCount}"
+                                           FontFamily="Consolas" FontSize="18"
+                                           FontWeight="Bold" Foreground="White"
+                                           Margin="0,0,6,0"/>
+                                <TextBlock Text="SHOWS" FontFamily="Consolas"
+                                           FontSize="10" Foreground="#888899"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#161622" BorderBrush="#2A2A3A"
+                                BorderThickness="1" CornerRadius="4"
+                                Padding="14,8" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding VideoCount}"
+                                           FontFamily="Consolas" FontSize="18"
+                                           FontWeight="Bold" Foreground="White"
+                                           Margin="0,0,6,0"/>
+                                <TextBlock Text="VIDEOS" FontFamily="Consolas"
+                                           FontSize="10" Foreground="#888899"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#161622" BorderBrush="#2A2A3A"
+                                BorderThickness="1" CornerRadius="4"
+                                Padding="14,8">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding CommercialCount}"
+                                           FontFamily="Consolas" FontSize="18"
+                                           FontWeight="Bold" Foreground="White"
+                                           Margin="0,0,6,0"/>
+                                <TextBlock Text="ADS" FontFamily="Consolas"
+                                           FontSize="10" Foreground="#888899"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                <TextBlock Text="Select an option from the menu"
-                           FontFamily="Consolas" FontSize="14"
-                           Foreground="#666677"
-                           HorizontalAlignment="Center"/>
+            <!-- Column headers -->
+            <Grid Grid.Row="1" Margin="28,14,28,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="TIME" FontFamily="Consolas"
+                           FontSize="10" Foreground="#555566"/>
+                <TextBlock Grid.Column="1" Text="TITLE" FontFamily="Consolas"
+                           FontSize="10" Foreground="#555566"/>
+                <TextBlock Grid.Column="2" Text="SHOW DUR" FontFamily="Consolas"
+                           FontSize="10" Foreground="#555566"/>
+                <TextBlock Grid.Column="3" Text="AD TIME" FontFamily="Consolas"
+                           FontSize="10" Foreground="#555566"/>
+                <TextBlock Grid.Column="4" Text="TRUE END" FontFamily="Consolas"
+                           FontSize="10" Foreground="#555566"/>
+            </Grid>
 
-                <!-- Quick stat cards -->
-                <StackPanel Orientation="Horizontal" Margin="0,48,0,0"
-                            HorizontalAlignment="Center">
-                    <Border Background="#161622" BorderBrush="#2A2A3A"
-                            BorderThickness="1" CornerRadius="6"
-                            Padding="24,16" Margin="6,0">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding ScheduledCount}"
-                                       FontFamily="Consolas" FontSize="28"
-                                       FontWeight="Bold" Foreground="White"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="SCHEDULED" FontFamily="Consolas"
-                                       FontSize="10" Foreground="#888899"
-                                       HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
-                    <Border Background="#161622" BorderBrush="#2A2A3A"
-                            BorderThickness="1" CornerRadius="6"
-                            Padding="24,16" Margin="6,0">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding VideoCount}"
-                                       FontFamily="Consolas" FontSize="28"
-                                       FontWeight="Bold" Foreground="White"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="VIDEOS" FontFamily="Consolas"
-                                       FontSize="10" Foreground="#888899"
-                                       HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
-                    <Border Background="#161622" BorderBrush="#2A2A3A"
-                            BorderThickness="1" CornerRadius="6"
-                            Padding="24,16" Margin="6,0">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding CommercialCount}"
-                                       FontFamily="Consolas" FontSize="28"
-                                       FontWeight="Bold" Foreground="White"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="ADS" FontFamily="Consolas"
-                                       FontSize="10" Foreground="#888899"
-                                       HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
+            <!-- Schedule list -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                          Margin="0,0,0,0">
+                <StackPanel Margin="28,0,28,28">
+
+                    <!-- Empty state -->
+                    <StackPanel Visibility="{Binding NoSchedule, Converter={StaticResource BoolToVis}}"
+                                HorizontalAlignment="Center" Margin="0,80,0,0">
+                        <TextBlock Text="📡" FontSize="48" HorizontalAlignment="Center"
+                                   Margin="0,0,0,16"/>
+                        <TextBlock Text="NO SHOWS SCHEDULED" FontFamily="Consolas"
+                                   FontSize="14" Foreground="#333344"
+                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock Text="Add videos in the Schedule manager to see them here."
+                                   FontFamily="Consolas" FontSize="11" Foreground="#2A2A3A"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Days -->
+                    <ItemsControl ItemsSource="{Binding ScheduleDays}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,24">
+
+                                    <!-- Date header -->
+                                    <Border Margin="0,0,0,10" Padding="0,0,0,8"
+                                            BorderBrush="#1A1A28" BorderThickness="0,0,0,1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Background="#E8312A" CornerRadius="2"
+                                                    Padding="6,2" Margin="0,0,10,0"
+                                                    Visibility="{Binding IsToday,
+                                                        Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="LIVE" FontFamily="Consolas"
+                                                           FontSize="9" FontWeight="Bold"
+                                                           Foreground="White"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding DateLabel}"
+                                                       FontFamily="Consolas" FontSize="12"
+                                                       FontWeight="Bold" Foreground="#9999AA"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Shows for this day -->
+                                    <ItemsControl ItemsSource="{Binding Shows}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,0,0,4">
+
+                                                    <!-- Show row -->
+                                                    <Border CornerRadius="6" Padding="14,10"
+                                                            BorderThickness="1" Margin="0,0,0,0">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="#161622"/>
+                                                                <Setter Property="BorderBrush"  Value="#2A2A3A"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsNow}" Value="True">
+                                                                        <Setter Property="Background" Value="#1A0A0A"/>
+                                                                        <Setter Property="BorderBrush"  Value="#E8312A"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="120"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="100"/>
+                                                                <ColumnDefinition Width="80"/>
+                                                                <ColumnDefinition Width="110"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- Time -->
+                                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding TimeRange}"
+                                                                           FontFamily="Consolas" FontSize="12"
+                                                                           Foreground="#9999AA"/>
+                                                                <Border Background="#E8312A" CornerRadius="2"
+                                                                        Padding="4,1" Margin="0,3,0,0"
+                                                                        HorizontalAlignment="Left"
+                                                                        Visibility="{Binding IsNow,
+                                                                            Converter={StaticResource BoolToVis}}">
+                                                                    <TextBlock Text="ON AIR NOW"
+                                                                               FontFamily="Consolas" FontSize="8"
+                                                                               FontWeight="Bold" Foreground="White"/>
+                                                                </Border>
+                                                            </StackPanel>
+
+                                                            <!-- Title -->
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding Title}"
+                                                                       FontFamily="Consolas" FontSize="14"
+                                                                       FontWeight="Bold" Foreground="White"
+                                                                       VerticalAlignment="Center"
+                                                                       TextTrimming="CharacterEllipsis"/>
+
+                                                            <!-- Show Duration -->
+                                                            <TextBlock Grid.Column="2"
+                                                                       Text="{Binding ShowDuration}"
+                                                                       FontFamily="Consolas" FontSize="12"
+                                                                       Foreground="#9999AA"
+                                                                       VerticalAlignment="Center"/>
+
+                                                            <!-- Ad Time -->
+                                                            <TextBlock Grid.Column="3"
+                                                                       Text="{Binding AdTime}"
+                                                                       FontFamily="Consolas" FontSize="12"
+                                                                       VerticalAlignment="Center">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="#555566"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding HasAds}" Value="True">
+                                                                                <Setter Property="Foreground" Value="#F0A500"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+
+                                                            <!-- True End -->
+                                                            <TextBlock Grid.Column="4"
+                                                                       Text="{Binding TrueEndTime}"
+                                                                       FontFamily="Consolas" FontSize="12"
+                                                                       Foreground="#9999AA"
+                                                                       VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- Commercial break sub-rows -->
+                                                    <ItemsControl ItemsSource="{Binding Breaks}"
+                                                                  Visibility="{Binding HasAds,
+                                                                      Converter={StaticResource BoolToVis}}"
+                                                                  Margin="20,0,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Background="#0D0D1A"
+                                                                        BorderBrush="#1A1A28"
+                                                                        BorderThickness="0,0,0,1"
+                                                                        Padding="12,6">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="100"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="100"/>
+                                                                            <ColumnDefinition Width="190"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <TextBlock Grid.Column="0"
+                                                                                   Text="{Binding Offset}"
+                                                                                   FontFamily="Consolas" FontSize="11"
+                                                                                   Foreground="#E8312A"/>
+                                                                        <TextBlock Grid.Column="1"
+                                                                                   Text="{Binding Title}"
+                                                                                   FontFamily="Consolas" FontSize="11"
+                                                                                   Foreground="#CCCCCC"
+                                                                                   TextTrimming="CharacterEllipsis"/>
+                                                                        <TextBlock Grid.Column="2"
+                                                                                   Text="{Binding Duration}"
+                                                                                   FontFamily="Consolas" FontSize="11"
+                                                                                   Foreground="#F0A500"/>
+                                                                        <TextBlock Grid.Column="3"
+                                                                                   Text="{Binding EndsAt}"
+                                                                                   FontFamily="Consolas" FontSize="11"
+                                                                                   Foreground="#555566"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
                 </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Window>

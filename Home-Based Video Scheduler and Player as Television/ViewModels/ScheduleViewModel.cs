@@ -37,7 +37,6 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             set { _startTimeText = value; OnPropertyChanged(nameof(StartTimeText)); }
         }
 
-        // Optional custom on-screen title — blank means use video filename
         private string _displayTitle = string.Empty;
         public string DisplayTitle
         {
@@ -62,7 +61,17 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
         public ICommand AddScheduleCommand    => new RelayCommand(AddSchedule);
         public ICommand RemoveScheduleCommand => new RelayCommand(RemoveSchedule);
 
-        public ScheduleViewModel() { }
+        public ScheduleViewModel()
+        {
+            // Pre-fill start time from the true end of the last scheduled item
+            if (Schedule.Any())
+            {
+                var last    = Schedule.OrderBy(s => s.StartTime).Last();
+                var trueEnd = CommercialBreakStore.Instance.GetTrueEndTime(last);
+                StartDate     = trueEnd.Date;
+                StartTimeText = trueEnd.ToString("HH:mm:ss");
+            }
+        }
 
         private void AddSchedule()
         {
@@ -73,17 +82,48 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
                 return;
             }
 
-            var start = GetStartDateTime();
-            var end   = start + SelectedVideo.Duration;
+            var start    = GetStartDateTime();
+            var videoEnd = start + SelectedVideo.Duration;
 
-            bool overlaps = Schedule.Any(s => start < s.EndTime && end > s.StartTime);
-            if (overlaps)
+            // Sort schedule so we check in chronological order
+            var sorted = Schedule.OrderBy(s => s.StartTime).ToList();
+
+            foreach (var existing in sorted)
             {
-                var r = MessageBox.Show(
-                    "This time slot overlaps with an existing entry. Add anyway?",
-                    "Overlap Detected", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (r != MessageBoxResult.Yes) return;
+                var existingTrueEnd = CommercialBreakStore.Instance.GetTrueEndTime(existing);
+
+                bool newOverlapsExistingVideo = start < existing.EndTime    && videoEnd > existing.StartTime;
+                bool newOverlapsExistingAds   = start < existingTrueEnd     && videoEnd > existing.EndTime;
+                bool existingAdsOverlapNew    = existingTrueEnd > start     && existing.EndTime <= start;
+
+                if (newOverlapsExistingVideo)
+                {
+                    // Hard video-on-video overlap — ask user
+                    var r = MessageBox.Show(
+                        $"'{SelectedVideo.Title}' overlaps with '{existing.VideoTitle}'.\n\nAdd anyway?",
+                        "Overlap Detected", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (r != MessageBoxResult.Yes) return;
+                    break;
+                }
+
+                if (existingAdsOverlapNew || newOverlapsExistingAds)
+                {
+                    // Commercial break of existing show runs into new show — hard block
+                    MessageBox.Show(
+                        $"Cannot schedule '{SelectedVideo.Title}' starting at {start:HH:mm:ss}.\n\n" +
+                        $"'{existing.VideoTitle}' has commercials that run until {existingTrueEnd:HH:mm:ss}.\n\n" +
+                        $"Please start the new show at {existingTrueEnd:HH:mm:ss} or later.",
+                        "Commercial Break Conflict",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
+
+            // Also check: does the new show's videoEnd push into the START of the next show?
+            // (i.e. the new show itself would need commercials that overlap the next show)
+            var nextShow = sorted.FirstOrDefault(s => s.StartTime >= videoEnd);
+            // This is fine — we only block if existing shows' TRUE ends conflict.
+            // Future commercials on the new show will be caught by CommercialBreakViewModel.
 
             Schedule.Add(new ScheduleItem
             {
@@ -92,14 +132,17 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
                 FilePath     = SelectedVideo.FilePath,
                 DisplayTitle = DisplayTitle.Trim(),
                 StartTime    = start,
-                EndTime      = end
+                EndTime      = videoEnd
             });
 
             _service.Save(Schedule.ToList());
 
-            StartTimeText = end.ToString("HH:mm:ss");
-            StartDate     = end.Date;
-            DisplayTitle  = string.Empty;  // reset for next entry
+            // Auto-fill next start from TrueEndTime of the show just added
+            var newItem   = Schedule.OrderBy(s => s.StartTime).Last(s => s.StartTime == start);
+            var trueEnd   = CommercialBreakStore.Instance.GetTrueEndTime(newItem);
+            StartTimeText = trueEnd.ToString("HH:mm:ss");
+            StartDate     = trueEnd.Date;
+            DisplayTitle  = string.Empty;
         }
 
         private void RemoveSchedule()

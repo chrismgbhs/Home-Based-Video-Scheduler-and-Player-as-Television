@@ -2,14 +2,13 @@ using Home_Based_Video_Scheduler_and_Player_as_Television.Models;
 using Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels;
 using System;
 using System.Collections.Specialized;
-using Microsoft.Win32;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Color = System.Windows.Media.Color;
 
 namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
 {
@@ -35,7 +34,6 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
             {
                 RedrawTimeline();
 
-                // Subscribe to collection changes for live updates
                 if (_vm.BreaksForShow != null)
                     _vm.BreaksForShow.CollectionChanged += (s2, e2) => RedrawTimeline();
             }
@@ -52,10 +50,8 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
             double totalSec = _vm.ShowDurationSeconds;
             if (totalSec <= 0) return;
 
-            // Fill the track to show full show length
             TrackFill.Width = trackW;
 
-            // Draw tick marks every 10% of duration
             for (int i = 1; i < 10; i++)
             {
                 double x = trackW * i / 10.0;
@@ -67,7 +63,6 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                 };
                 TimelineCanvas.Children.Add(tick);
 
-                // Time label
                 var secs = totalSec * i / 10.0;
                 var ts   = TimeSpan.FromSeconds(secs);
                 var lbl  = new TextBlock
@@ -75,21 +70,20 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                     Text       = ts.ToString(@"h\:mm"),
                     FontFamily = new FontFamily("Consolas"),
                     FontSize   = 9,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x44, 0x44, 0x55))
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0xAA))
                 };
                 Canvas.SetLeft(lbl, x - 14);
                 Canvas.SetTop(lbl, 0);
                 TimeLabelCanvas.Children.Add(lbl);
             }
 
-            // Draw a marker for each commercial break
             if (_vm.BreaksForShow == null) return;
-            foreach (var b in _vm.BreaksForShow)
+            foreach (var bd in _vm.BreaksForShow)
             {
+                var b = bd.Break;
                 double ratio = b.Offset.TotalSeconds / totalSec;
                 double x     = trackW * ratio;
 
-                // Vertical line
                 var line = new Line
                 {
                     X1 = x, Y1 = 4, X2 = x, Y2 = 48,
@@ -98,7 +92,6 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                 };
                 TimelineCanvas.Children.Add(line);
 
-                // Diamond marker at mid-track
                 var diamond = new Polygon
                 {
                     Fill = new SolidColorBrush(Color.FromRgb(0xE8, 0x31, 0x2A)),
@@ -110,14 +103,12 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                         new Point(x - 6, 28)
                     }
                 };
-                // Tooltip with commercial name and offset
                 diamond.ToolTip = $"[Ad] {b.CommercialTitle}\n@ {b.OffsetDisplay}";
                 diamond.Cursor  = Cursors.Hand;
-                diamond.Tag     = b;
-                diamond.MouseLeftButtonDown += (s, e) => _vm.SelectedBreak = (CommercialBreak)((Polygon)s).Tag;
+                diamond.Tag     = bd;
+                diamond.MouseLeftButtonDown += (s, e) => _vm.SelectedBreak = (CommercialBreakDisplay)((Polygon)s).Tag;
                 TimelineCanvas.Children.Add(diamond);
 
-                // Offset label above the line
                 var label = new TextBlock
                 {
                     Text       = b.Offset.ToString(@"h\:mm"),
@@ -130,12 +121,11 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                 TimelineCanvas.Children.Add(label);
             }
 
-            // START / END labels
             var start = new TextBlock
             {
                 Text = "START", FontFamily = new FontFamily("Consolas"),
                 FontSize = 9,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x44))
+                Foreground = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0xAA))
             };
             Canvas.SetLeft(start, 0); Canvas.SetTop(start, 0);
             TimeLabelCanvas.Children.Add(start);
@@ -146,7 +136,7 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
                 Text = totalTs.ToString(@"h\:mm"),
                 FontFamily = new FontFamily("Consolas"),
                 FontSize = 9,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x44))
+                Foreground = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0xAA))
             };
             Canvas.SetRight(end, 0); Canvas.SetTop(end, 0);
             TimeLabelCanvas.Children.Add(end);

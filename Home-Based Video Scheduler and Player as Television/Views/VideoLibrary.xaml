@@ -1,0 +1,29 @@
+﻿<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.VideoLibrary"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Home_Based_Video_Scheduler_and_Player_as_Television.Views"
+        mc:Ignorable="d"
+        Title="VideoLibrary" Height="450" Width="800">
+    <StackPanel Margin="10">
+        <!-- Add Video Button -->
+        <Button Content="Add Video"
+            Command="{Binding AddVideoCommand}"
+            Width="100"
+            Margin="0,0,0,10"/>
+
+        <!-- Remove Video Button -->
+        <Button Content="Remove Video"
+            Command="{Binding RemoveVideoCommand}"
+            Width="100"
+            Margin="0,0,0,10"
+            IsEnabled="{Binding SelectedVideo, Converter={StaticResource NullToBoolConverter}}"/>
+
+        <!-- Video List -->
+        <ListBox ItemsSource="{Binding Videos}"
+             SelectedItem="{Binding SelectedVideo, Mode=TwoWay}"
+             DisplayMemberPath="Title"
+             Height="300"/>
+    </StackPanel>
+</Window>

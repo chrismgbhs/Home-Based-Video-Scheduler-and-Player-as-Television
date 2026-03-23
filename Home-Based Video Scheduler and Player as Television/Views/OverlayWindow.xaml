@@ -1,0 +1,44 @@
+﻿<Window x:Class="Home_Based_Video_Scheduler_and_Player_as_Television.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        IsHitTestVisible="False">
+    
+
+    <Grid IsHitTestVisible="False">
+
+        <!-- Logo -->
+        <Image Source="{Binding LogoImage}"
+               HorizontalAlignment="Right"
+               VerticalAlignment="Top"
+               Height="150"
+               Margin="50"
+               Opacity="0.8"/>
+
+        <!-- Now Playing -->
+        <TextBlock Text="{Binding NowPlaying}"
+           Margin="100"
+           VerticalAlignment="Top"
+           Foreground="White"
+           FontSize="18"
+           FontWeight="Bold">
+
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding NowPlayingVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </Grid>
+</Window>

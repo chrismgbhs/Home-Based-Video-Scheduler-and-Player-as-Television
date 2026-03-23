@@ -27,7 +27,10 @@ Home-Based Video Scheduler and Player as Television">
                         <Button Content="Video Player" Style="{StaticResource NormalButton}" Command="{Binding ViewPlayerCommand}"/>
                     </Border>
                     <Border Style="{StaticResource NormalButtonBorder}">
-                        <Button Content="Scheduler" Style="{StaticResource NormalButton}" Command="{Binding SchedulerCommand}"/>
+                        <Button Content="Video Library" Style="{StaticResource NormalButton}" Command="{Binding VideoLibraryCommand}"/>
+                    </Border>
+                    <Border Style="{StaticResource NormalButtonBorder}">
+                        <Button Content="Schedule" Style="{StaticResource NormalButton}" Command="{Binding SchedulerCommand}"/>
                     </Border>
                     <Border Style="{StaticResource NormalButtonBorder}">
                         <Button Content="Settings" Style="{StaticResource NormalButton}" Command="{Binding SettingsCommand}"/>

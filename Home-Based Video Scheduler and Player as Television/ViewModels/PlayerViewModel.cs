@@ -1,14 +1,35 @@
 ﻿using LibVLCSharp.Shared;
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
+using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
 
 namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
 {
     public class PlayerViewModel : INotifyPropertyChanged
     {
+        public async void ShowNowPlayingTemporarily()
+        {
+            NowPlayingVisible = true;
+            await Task.Delay(5000);
+            NowPlayingVisible = false;
+        }
+
         private LibVLC _libVLC;
         public MediaPlayer MediaPlayer { get; private set; }
+
+        private BitmapImage _logoImage;
+        public BitmapImage LogoImage
+        {
+            get => _logoImage;
+            set
+            {
+                _logoImage = value;
+                OnPropertyChanged(nameof(LogoImage));
+            }
+        }
 
         private string _nowPlaying;
         public string NowPlaying
@@ -21,24 +42,14 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             }
         }
 
-        private string _logoPath;
-        public string LogoPath
-        {
-            get => _logoPath;
-            set
-            {
-                _logoPath = value;
-                OnPropertyChanged(nameof(LogoPath));
-            }
-        }
-
         public PlayerViewModel()
         {
             Core.Initialize();
 
             _libVLC = new LibVLC();
             MediaPlayer = new MediaPlayer(_libVLC);
-            PlayVideo("C:/Users/chris/Videos/2025 DRAMAS.mp4");
+            PlayVideo("C:/Users/chris/Videos/Riko Valentine's.mp4");
+            LogoImage = new BitmapImage(new Uri("C:/Users/chris/Pictures/Logo and Signatures/Chriz Logo.png"));
         }
 
         // 🎬 PLAY VIDEO
@@ -57,7 +68,8 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
 
             MediaPlayer.Play(media);
 
-            NowPlaying = Path.GetFileName(path);
+            NowPlaying = Path.GetFileNameWithoutExtension(path);
+            ShowNowPlayingTemporarily();
         }
 
         public void Pause() => MediaPlayer?.Pause();
@@ -71,6 +83,21 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
             if (MediaPlayer != null)
                 MediaPlayer.Time = time;
         }
+
+        private bool _nowPlayingVisible;
+        public bool NowPlayingVisible
+        {
+            get => _nowPlayingVisible;
+            set
+            {
+                _nowPlayingVisible = value;
+                OnPropertyChanged(nameof(NowPlayingVisible));
+            }
+        }
+
+
+
+
 
         // 🔔 REQUIRED FOR BINDING
         public event PropertyChangedEventHandler PropertyChanged;

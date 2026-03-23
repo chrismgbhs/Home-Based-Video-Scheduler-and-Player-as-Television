@@ -13,11 +13,11 @@ using System.Windows.Shapes;
 namespace Home_Based_Video_Scheduler_and_Player_as_Television.Views
 {
     /// <summary>
-    /// Interaction logic for Scheduler.xaml
+    /// Interaction logic for OverlayWindow.xaml
     /// </summary>
-    public partial class Scheduler : Window
+    public partial class OverlayWindow : Window
     {
-        public Scheduler()
+        public OverlayWindow()
         {
             InitializeComponent();
         }

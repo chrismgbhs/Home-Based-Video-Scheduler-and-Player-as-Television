@@ -9,6 +9,7 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
     class MainMenuViewModel
     {
         public ICommand ViewPlayerCommand { get; set; }
+        public ICommand VideoLibraryCommand { get; set; }
         public ICommand SchedulerCommand { get; set; }
         public ICommand SettingsCommand { get; set; }
 
@@ -16,7 +17,18 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
         {
             ViewPlayerCommand = new RelayCommand(ExecuteViewPlayer);
             SchedulerCommand = new RelayCommand(ExecuteScheduler);
+            VideoLibraryCommand = new RelayCommand(ExecuteVideoLibrary);
             SettingsCommand = new RelayCommand(ExecuteSettings);
+        }
+
+        public void ExecuteVideoLibrary()
+        {
+            var mainWindow = new Views.VideoLibrary();
+            Application.Current.MainWindow = mainWindow; // ✅ Set BEFORE closing
+            mainWindow.Show();                           // ✅ Non-blocking
+            //Application.Current.Windows
+            //    .OfType<Views.MainMenu>()
+            //    .FirstOrDefault()?.Close();                 // ✅ Close login after
         }
 
         public void ExecuteViewPlayer()
@@ -30,12 +42,12 @@ namespace Home_Based_Video_Scheduler_and_Player_as_Television.ViewModels
         }
         public void ExecuteScheduler()
         {
-            var mainWindow = new Views.Scheduler();
+            var mainWindow = new Views.Schedule();
             Application.Current.MainWindow = mainWindow; // ✅ Set BEFORE closing
             mainWindow.Show();                           // ✅ Non-blocking
-            Application.Current.Windows
-                .OfType<Views.MainMenu>()
-                .FirstOrDefault()?.Close();                 // ✅ Close login after
+            //Application.Current.Windows
+            //    .OfType<Views.MainMenu>()
+            //    .FirstOrDefault()?.Close();                 // ✅ Close login after
         }
         public void ExecuteSettings()
         {

@@ -67,12 +67,10 @@ Schedule your own shows, insert commercial breaks, fill gaps automatically with 
 ---
 
 ## 🖼️ Screenshots
-
-> Add screenshots here after installing. Suggested shots:
-> - Main menu dashboard with a full schedule
-> - Player with overlay showing Now Playing + logo
-> - Commercial Break Editor with timeline markers
-> - Schedule Manager showing True End Time column
+![Dashboard](screenshots/dashboard.png)
+![Player](screenshots/player.png)
+![Commercial Breaks Editor](screenshots/commercial-breaks.png)
+![Schedule Managerr](screenshots/schedule-manager.png)
 
 ---
 

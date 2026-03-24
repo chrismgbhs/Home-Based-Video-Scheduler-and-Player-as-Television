@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home TV Station — Broadcast From Your PC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #08080f;
+      --bg2:     #0d0d18;
+      --card:    #111120;
+      --border:  #1e1e30;
+      --red:     #e8312a;
+      --red-dim: #7a1510;
+      --amber:   #f0a500;
+      --white:   #f0f0f0;
+      --muted:   #555570;
+      --mono:    'Share Tech Mono', monospace;
+      --display: 'Bebas Neue', sans-serif;
+      --body:    'Inter', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: var(--body); overflow-x: hidden; }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 60px;
+      background: rgba(8,8,15,0.94); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--red); display: flex; align-items: center; gap: 10px; }
+    .nav-logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-family: var(--mono); font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: .1em; transition: color .2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta { font-family: var(--mono); font-size: 12px; padding: 8px 20px; background: var(--red); color: white; text-decoration: none; border-radius: 3px; letter-spacing: .05em; transition: background .2s, transform .1s; }
+    .nav-cta:hover { background: #c9271f; transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; padding: 120px 24px 80px; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(232,49,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(232,49,42,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+    .hero-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(232,49,42,0.12) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+
+    .hero-tag { font-family: var(--mono); font-size: 11px; color: var(--red); letter-spacing: .3em; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; opacity: 0; animation: fadeUp .6s ease forwards .2s; }
+    .hero-tag::before, .hero-tag::after { content: ''; display: block; width: 32px; height: 1px; background: var(--red); opacity: .5; }
+
+    h1 { font-family: var(--display); font-size: clamp(64px, 10vw, 120px); line-height: .9; text-align: center; letter-spacing: .02em; margin-bottom: 8px; opacity: 0; animation: fadeUp .7s ease forwards .35s; }
+    h1 span { color: var(--red); }
+
+    .hero-sub { font-family: var(--mono); font-size: clamp(13px,1.5vw,16px); color: var(--muted); text-align: center; max-width: 540px; line-height: 1.7; margin-bottom: 48px; opacity: 0; animation: fadeUp .7s ease forwards .5s; }
+
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; opacity: 0; animation: fadeUp .7s ease forwards .65s; }
+
+    .btn-primary { font-family: var(--mono); font-size: 13px; padding: 14px 32px; background: var(--red); color: white; text-decoration: none; border-radius: 3px; letter-spacing: .08em; transition: background .2s, transform .15s, box-shadow .2s; }
+    .btn-primary:hover { background: #c9271f; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(232,49,42,.3); }
+    .btn-secondary { font-family: var(--mono); font-size: 13px; padding: 14px 32px; background: transparent; color: var(--white); text-decoration: none; border-radius: 3px; border: 1px solid var(--border); letter-spacing: .08em; transition: border-color .2s, transform .15s; }
+    .btn-secondary:hover { border-color: var(--muted); transform: translateY(-2px); }
+
+    .hero-clock { position: absolute; bottom: 40px; right: 48px; font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; opacity: 0; animation: fadeUp .6s ease forwards 1s; }
+    .hero-clock .time { font-size: 22px; color: var(--white); display: block; margin-bottom: 2px; }
+
+    .signal-bars { position: absolute; bottom: 40px; left: 48px; display: flex; align-items: flex-end; gap: 4px; opacity: 0; animation: fadeUp .6s ease forwards 1s; }
+    .signal-bars .bar { width: 6px; background: var(--red); border-radius: 2px; animation: signalPulse 1.2s ease-in-out infinite; }
+    .signal-bars .bar:nth-child(1){height:8px;animation-delay:0s}
+    .signal-bars .bar:nth-child(2){height:14px;animation-delay:.1s}
+    .signal-bars .bar:nth-child(3){height:20px;animation-delay:.2s}
+    .signal-bars .bar:nth-child(4){height:14px;animation-delay:.3s}
+    .signal-bars .bar:nth-child(5){height:8px;animation-delay:.4s}
+    @keyframes signalPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* MOCK TV */
+    .tv-container { margin-top: 64px; position: relative; width: min(700px, 90vw); opacity: 0; animation: fadeUp .8s ease forwards .8s; }
+    .tv-frame { background: #050508; border: 2px solid var(--border); border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; position: relative; box-shadow: 0 0 0 1px rgba(232,49,42,.1), 0 0 60px rgba(232,49,42,.08), 0 32px 80px rgba(0,0,0,.8); }
+    .tv-content { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 20px; background: linear-gradient(135deg, #0a0a14 0%, #080810 100%); }
+    .tv-overlay-bar { display: flex; align-items: flex-start; justify-content: space-between; }
+    .tv-now-playing { font-family: var(--mono); }
+    .tv-now-playing .label { font-size: 9px; color: var(--red); letter-spacing: .2em; margin-bottom: 4px; }
+    .tv-now-playing .title { font-size: clamp(14px,2.5vw,20px); font-weight: bold; color: white; }
+    .tv-now-playing .clock { font-size: clamp(10px,1.5vw,13px); color: #888; margin-top: 3px; }
+    .tv-logo-box { width: clamp(40px,8vw,70px); height: clamp(40px,8vw,70px); border: 1px solid #2a2a3a; border-radius: 6px; background: #161622; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: clamp(7px,1.2vw,10px); color: #444; text-align: center; }
+    .tv-video-area { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .tv-play-icon { width: clamp(36px,6vw,56px); height: clamp(36px,6vw,56px); border-radius: 50%; background: rgba(232,49,42,.15); border: 1px solid rgba(232,49,42,.3); display: flex; align-items: center; justify-content: center; font-size: clamp(14px,2.5vw,22px); }
+    .tv-upnext { font-family: var(--mono); font-size: clamp(8px,1.3vw,11px); color: #888; display: flex; align-items: center; gap: 8px; }
+    .tv-upnext .badge { font-size: clamp(7px,1vw,9px); color: #666; letter-spacing: .15em; }
+    .tv-upnext .next-title { color: white; }
+
+    /* SECTIONS */
+    section { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag { font-family: var(--mono); font-size: 11px; color: var(--red); letter-spacing: .25em; margin-bottom: 16px; }
+    .section-title { font-family: var(--display); font-size: clamp(36px,5vw,64px); line-height: 1; margin-bottom: 16px; letter-spacing: .02em; }
+    .section-desc { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 540px; margin-bottom: 56px; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .feature-card { background: var(--card); padding: 32px; transition: background .2s; }
+    .feature-card:hover { background: #161625; }
+    .feature-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+    .feature-title { font-family: var(--mono); font-size: 13px; color: var(--white); margin-bottom: 10px; letter-spacing: .05em; }
+    .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+    /* STEPS */
+    .steps { display: flex; flex-direction: column; }
+    .step { display: grid; grid-template-columns: 60px 1fr; gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--border); opacity: 0; transform: translateX(-20px); transition: opacity .5s ease, transform .5s ease; }
+    .step.visible { opacity: 1; transform: translateX(0); }
+    .step-num { font-family: var(--display); font-size: 48px; color: var(--red-dim); line-height: 1; padding-top: 4px; }
+    .step-title { font-family: var(--mono); font-size: 15px; color: var(--white); margin-bottom: 8px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* TECH */
+    .tech-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .tech-badge { font-family: var(--mono); font-size: 12px; padding: 8px 16px; border: 1px solid var(--border); border-radius: 3px; color: var(--muted); transition: border-color .2s, color .2s; }
+    .tech-badge:hover { border-color: var(--red); color: var(--white); }
+    .tech-card { padding: 24px; border: 1px solid var(--border); border-radius: 6px; }
+    .tech-card-label { font-family: var(--mono); font-size: 11px; color: var(--red); margin-bottom: 10px; }
+    .tech-card-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    code { color: #aaa; font-size: 12px; font-family: var(--mono); }
+
+    /* DOWNLOAD */
+    .download-section { text-align: center; padding: 120px 24px; position: relative; overflow: hidden; }
+    .download-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(232,49,42,.08) 0%, transparent 70%); pointer-events: none; }
+    .download-section h2 { font-family: var(--display); font-size: clamp(40px,6vw,80px); margin-bottom: 16px; letter-spacing: .02em; }
+    .download-section p { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+    .download-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 32px; }
+    .download-meta span { font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .download-meta span::before { content: '—'; color: var(--red-dim); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .footer-left strong { color: var(--white); font-weight: normal; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-family: var(--mono); font-size: 11px; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--white); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .signal-bars, .hero-clock { display: none; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">
+      <div class="dot"></div>
+      HOME TV STATION
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">FEATURES</a></li>
+      <li><a href="#how">HOW IT WORKS</a></li>
+      <li><a href="#tech">TECH</a></li>
+      <li><a href="#download">DOWNLOAD</a></li>
+    </ul>
+    <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/releases" class="nav-cta">DOWNLOAD</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="signal-bars">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div>
+    </div>
+
+    <p class="hero-tag">📡 BROADCAST FROM YOUR PC</p>
+    <h1>HOME <span>TV</span><br>STATION</h1>
+    <p class="hero-sub">Schedule your own shows, insert commercial breaks, and watch it all play back like a live television channel — right from your desktop.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/releases" class="btn-primary">⬇ DOWNLOAD v1.0</a>
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television" class="btn-secondary">VIEW SOURCE</a>
+    </div>
+
+    <div class="tv-container">
+      <div class="tv-frame">
+        <div class="tv-content">
+          <div class="tv-overlay-bar">
+            <div class="tv-now-playing">
+              <div class="label">NOW PLAYING</div>
+              <div class="title">My Favourite Movie</div>
+              <div class="clock" id="tv-clock">--:--:--</div>
+            </div>
+            <div class="tv-logo-box">YOUR<br>LOGO</div>
+          </div>
+          <div class="tv-video-area">
+            <div class="tv-play-icon">▶</div>
+          </div>
+          <div class="tv-upnext">
+            <span class="badge">UP NEXT</span>
+            <span class="next-title">Documentary Night</span>
+            <span>@ 21:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-clock">
+      <span class="time" id="hero-time">--:--:--</span>
+      LOCAL TIME
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <p class="section-tag reveal">WHAT IT DOES</p>
+    <h2 class="section-title reveal">Everything a real<br>station needs.</h2>
+    <p class="section-desc reveal">Built for anyone who wants to run their own TV channel at home — from movie nights to 24/7 personal broadcast loops.</p>
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <span class="feature-icon">📺</span>
+        <div class="feature-title">LIVE-POSITION PLAYBACK</div>
+        <div class="feature-desc">Opens mid-show at the correct live position, just like tuning into a real TV channel. No rewinding, no waiting.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🗓️</span>
+        <div class="feature-title">SCHEDULE MANAGER</div>
+        <div class="feature-desc">Schedule any video at any date and time. Conflict detection prevents overlaps — including commercials from adjacent shows.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📢</span>
+        <div class="feature-title">COMMERCIAL BREAKS</div>
+        <div class="feature-desc">Assign ad breaks to shows at precise offsets. Visual timeline editor shows every break as a marker. Overlap prevention built in.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔀</span>
+        <div class="feature-title">AUTO GAP FILLER</div>
+        <div class="feature-desc">Empty time between shows is automatically filled with commercials. Weighted random selection and cooldown keeps it varied.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🖥️</span>
+        <div class="feature-title">BROADCAST OVERLAY</div>
+        <div class="feature-desc">Now Playing, live clock, Up Next preview, and your channel logo — displayed over the fullscreen player with smooth animations.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div class="feature-title">LIVE DASHBOARD</div>
+        <div class="feature-desc">Full programme listing grouped by date, with ON AIR NOW highlighting and commercial sub-rows under each show. Updates live.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" style="padding-top:0">
+    <p class="section-tag reveal">QUICK START</p>
+    <h2 class="section-title reveal">Up and running<br>in five steps.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">ADD YOUR VIDEOS</div>
+          <div class="step-desc">Open the Video Library and click <strong>+ Add Files</strong> or <strong>+ Add Folder</strong>. Durations are read automatically in the background using a shared LibVLC instance.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">BUILD YOUR SCHEDULE</div>
+          <div class="step-desc">Open the Schedule Manager, pick a video, set a start date and time, and click Add. The next suggested time auto-fills after each entry — always based on True End Time.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">ADD COMMERCIALS (OPTIONAL)</div>
+          <div class="step-desc">Add ad clips to the Commercial Library, assign weights to control play frequency, then assign them to specific shows at specific offsets in the visual timeline editor.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">CONFIGURE YOUR STATION</div>
+          <div class="step-desc">Upload your channel logo in Settings, adjust its size (40–200px) and opacity (10–100%), and toggle the overlay and auto-fill commercials on or off.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div>
+          <div class="step-title">GO ON AIR</div>
+          <div class="step-desc">Click <strong>Video Player</strong> on the main menu. The player opens fullscreen, seeks to the correct live position, and your station is live.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH -->
+  <section id="tech">
+    <p class="section-tag reveal">UNDER THE HOOD</p>
+    <h2 class="section-title reveal">Built on solid<br>foundations.</h2>
+    <p class="section-desc reveal">A WPF application following strict MVVM architecture, powered by LibVLCSharp for hardware-accelerated video playback on Windows.</p>
+    <div class="tech-row reveal">
+      <div class="tech-badge">.NET 10.0</div>
+      <div class="tech-badge">WPF</div>
+      <div class="tech-badge">C#</div>
+      <div class="tech-badge">LibVLCSharp</div>
+      <div class="tech-badge">MVVM</div>
+      <div class="tech-badge">Visual Studio 2026</div>
+      <div class="tech-badge">Windows 10 / 11</div>
+      <div class="tech-badge">x64</div>
+    </div>
+    <div style="margin-top:56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+      <div class="tech-card reveal">
+        <div class="tech-card-label">PLAYBACK ENGINE</div>
+        <div class="tech-card-desc">LibVLC renders into a native Win32 HWND. A separate transparent overlay window uses <code>WS_EX_TRANSPARENT</code> to draw on top — the only reliable way to layer WPF content over VLC.</div>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-card-label">TRUE END TIME</div>
+        <div class="tech-card-desc">Every show has a True End Time = video end + all commercial durations. Conflict detection uses this everywhere — you can never schedule into a commercial break.</div>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-card-label">GAP FILLER</div>
+        <div class="tech-card-desc">Uses a wall-clock <code>DispatcherTimer</code> — not MediaPlayer.Time — so commercial cuts happen at exact wall-clock times with zero drift.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <div class="download-section" id="download">
+    <h2 class="reveal">READY TO<br>BROADCAST?</h2>
+    <p class="reveal">Self-contained installer — no runtime required. Works on Windows 10 and 11 (64-bit).</p>
+    <div class="hero-actions reveal">
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/releases" class="btn-primary">⬇ DOWNLOAD INSTALLER</a>
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television" class="btn-secondary">VIEW ON GITHUB</a>
+    </div>
+    <div class="download-meta reveal">
+      <span>Windows 10 / 11 (64-bit)</span>
+      <span>Self-contained — no .NET required</span>
+      <span>Free &amp; open source</span>
+      <span>v1.0.0 Pre-release</span>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <strong>HOME TV STATION</strong> &nbsp;—&nbsp;
+      Made by Chris Boen Magbuhos &nbsp;·&nbsp; MIT License
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television">GitHub</a>
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/releases">Releases</a>
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/issues">Issues</a>
+      <a href="https://github.com/chrismgbhs/Home-Based-Video-Scheduler-and-Player-as-Television/blob/main/LICENSE">License</a>
+    </div>
+  </footer>
+
+  <script>
+    function updateClocks() {
+      const t = new Date().toLocaleTimeString('en-US', { hour12: false });
+      document.getElementById('hero-time').textContent = t;
+      document.getElementById('tv-clock').textContent  = t;
+    }
+    updateClocks();
+    setInterval(updateClocks, 1000);
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    const stepObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.step').forEach((s, i) =>
+            setTimeout(() => s.classList.add('visible'), i * 120));
+          stepObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.1 });
+    const stepsEl = document.querySelector('.steps');
+    if (stepsEl) stepObserver.observe(stepsEl);
+  </script>
+</body>
+</html>

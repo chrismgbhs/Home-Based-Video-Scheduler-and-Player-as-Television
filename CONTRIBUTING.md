@@ -4,7 +4,7 @@ Thank you for your interest in contributing! Here's everything you need to know.
 
 ## Development Setup
 
-1. Clone the repo and open the `.sln` in Visual Studio 2022
+1. Clone the repo and open the `.sln` in Visual Studio 2026
 2. NuGet packages restore automatically on first build
 3. Run in **Debug** mode — the app will write data to `%APPDATA%\HomeTVStation\`
 

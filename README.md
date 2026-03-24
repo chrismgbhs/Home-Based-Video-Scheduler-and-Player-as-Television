@@ -67,10 +67,6 @@ Schedule your own shows, insert commercial breaks, fill gaps automatically with 
 ---
 
 ## 🖼️ Screenshots
-![Dashboard](screenshots/dashboard.png)
-![Player](screenshots/player.png)
-![Commercial Breaks Editor](screenshots/commercial-breaks.png)
-![Schedule Managerr](screenshots/schedule-manager.png)
 
 ---
 

@@ -149,8 +149,8 @@ Home TV Station/
 ## 🔧 Building from Source
 
 ### Prerequisites
-- Visual Studio 2022 (Community or higher)
-- .NET 8.0 SDK
+- Visual Studio 2026 (Community or higher)
+- .NET 10.0 SDK
 - NuGet packages (restored automatically):
   - `LibVLCSharp.WPF` 3.x
   - `VideoLAN.LibVLC.Windows` 3.x

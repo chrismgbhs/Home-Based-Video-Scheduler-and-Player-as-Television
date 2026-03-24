@@ -8,7 +8,8 @@ Schedule your own shows, insert commercial breaks, fill gaps automatically with 
 
 ![Version](https://img.shields.io/badge/version-1.0.0--pre-orange)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)
-![Framework](https://img.shields.io/badge/.NET-10.0--windows-purple)
+![Framework](https://img.shields.io/badge/.NET-8.0--windows-purple)
+![IDE](https://img.shields.io/badge/Visual%20Studio-2026-blueviolet)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
@@ -150,7 +151,7 @@ Home TV Station/
 
 ### Prerequisites
 - Visual Studio 2026 (Community or higher)
-- .NET 10.0 SDK
+- .NET 8.0 SDK
 - NuGet packages (restored automatically):
   - `LibVLCSharp.WPF` 3.x
   - `VideoLAN.LibVLC.Windows` 3.x

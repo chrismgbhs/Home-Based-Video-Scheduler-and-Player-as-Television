@@ -8,7 +8,7 @@ Schedule your own shows, insert commercial breaks, fill gaps automatically with 
 
 ![Version](https://img.shields.io/badge/version-1.0.0--pre-orange)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)
-![Framework](https://img.shields.io/badge/.NET-8.0--windows-purple)
+![Framework](https://img.shields.io/badge/.NET-10.0--windows-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
